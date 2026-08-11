@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Interaktif Barisan & Geometri</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- KaTeX CDN for mathematical formulas -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="triggerMathRender()"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-indigo-600 text-white rounded-xl shadow-md">
+                        <i data-lucide="brain-circuit" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg leading-tight text-slate-900">EduMath Quiz Master</h1>
+                        <p class="text-xs text-slate-500">20 Soal Barisan Aritmetika & Geometri</p>
+                    </div>
+                </div>
+
+                <!-- Reset Button -->
+                <div class="flex items-center gap-2 sm:gap-4">
+                    <button onclick="openResetModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-rose-200 text-rose-600 hover:bg-rose-50 font-semibold text-xs transition">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset Kuis
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- Top Overview & Progress Card -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Kuis Interaktif Instan</span>
+                    <h2 class="text-2xl font-bold text-slate-900 mt-0.5">Uji Barisan Aritmetika & Geometri</h2>
+                    <p class="text-xs text-slate-500 mt-1">Pilihlah jawaban untuk langsung melihat status kebenaran dan pembahasannya.</p>
+                </div>
+
+                <div class="flex items-center gap-4 bg-slate-50 p-3 rounded-xl border border-slate-200 shrink-0">
+                    <div class="text-center px-2">
+                        <span class="text-[10px] text-slate-400 font-semibold uppercase block">Progres Dijawab</span>
+                        <span id="progress-text" class="text-lg font-extrabold text-indigo-600">0 / 20</span>
+                    </div>
+                    <div class="h-8 w-px bg-slate-200"></div>
+                    <div class="text-center px-2">
+                        <span class="text-[10px] text-slate-400 font-semibold uppercase block">Skor Saat Ini</span>
+                        <span id="score-text" class="text-lg font-extrabold text-slate-400">0 / 100</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                <div id="progress-bar" class="bg-indigo-600 h-full transition-all duration-300 w-0"></div>
+            </div>
+
+            <!-- Question Navigation Grid -->
+            <div>
+                <span class="text-xs font-bold text-slate-500 mb-2 block">Navigasi Soal (1 - 20):</span>
+                <div id="nav-grid" class="grid grid-cols-5 sm:grid-cols-10 md:grid-cols-20 gap-1.5">
+                    <!-- Nav buttons dynamic rendering -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Questions Section -->
+        <div id="questions-container" class="space-y-6">
+            <!-- Questions rendered via JS -->
+        </div>
+
+    </main>
+
+    <!-- Custom Reset Confirmation Modal -->
+    <div id="reset-modal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-slate-100 space-y-4 fade-in">
+            <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
+                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+            </div>
+            <div class="text-center">
+                <h3 class="text-lg font-bold text-slate-900">Reset Seluruh Kuis?</h3>
+                <p class="text-xs text-slate-500 mt-1">Semua jawaban dan skor yang tersimpan akan dihapus dan kuis dimulai dari awal.</p>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button onclick="closeResetModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">Batal</button>
+                <button onclick="executeReset()" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md transition">Ya, Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-6">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+            <p>© 2026 EduMath Interactive • Evaluasi Mandiri Barisan Aritmetika & Geometri</p>
+        </div>
+    </footer>
+
+    <script>
+        // 20 Questions Data Array (Balanced random keys: 5 A, 5 B, 5 C, 5 D)
+        const quizData = [
+            {
+                id: 1,
+                type: "Aritmetika",
+                question: "Diketahui barisan aritmetika dengan suku ke-4 ($U_4 = 17$) dan suku ke-9 ($U_9 = 37$). Berapakah nilai suku pertama ($a$) dan beda ($b$) barisan tersebut?",
+                options: [
+                    { text: "$a = 4, b = 5$", isCorrect: false },
+                    { text: "$a = 5, b = 4$", isCorrect: true },
+                    { text: "$a = 5, b = 3$", isCorrect: false },
+                    { text: "$a = 3, b = 4$", isCorrect: false }
+                ],
+                explanation: "Gunakan selisih dua suku: $b = \\frac{U_9 - U_4}{9 - 4} = \\frac{37 - 17}{5} = \\frac{20}{5} = 4$. Substitusi $b = 4$ ke $U_4 = a + 3b \\implies 17 = a + 3(4) \\implies a = 17 - 12 = 5$. Kunci Jawaban: **B**."
+            },
+            {
+                id: 2,
+                type: "Geometri",
+                question: "Diketahui suku ke-3 suatu barisan geometri adalah $18$ ($U_3 = 18$) dan suku ke-6 adalah $486$ ($U_6 = 486$). Berapakah rasio ($r$) dan suku pertama ($a$) barisan ini?",
+                options: [
+                    { text: "$r = 2$ dan $a = 3$", isCorrect: false },
+                    { text: "$r = 3$ dan $a = 6$", isCorrect: false },
+                    { text: "$r = 9$ dan $a = 2$", isCorrect: false },
+                    { text: "$r = 3$ dan $a = 2$", isCorrect: true }
+                ],
+                explanation: "Pembagian suku: $\\frac{U_6}{U_3} = r^{6-3} \\implies \\frac{486}{18} = r^3 \\implies r^3 = 27 \\implies r = 3$. Untuk suku pertama: $U_3 = a \\cdot r^2 \\implies 18 = a \\cdot (3^2) \\implies 18 = 9a \\implies a = 2$. Kunci Jawaban: **D**."
+            },
+            {
+                id: 3,
+                type: "Aritmetika",
+                question: "Banyaknya suku ($n$) pada barisan aritmetika $-4, 1, 6, 11, \\dots, 96$ adalah...",
+                options: [
+                    { text: "$n = 21$", isCorrect: true },
+                    { text: "$n = 19$", isCorrect: false },
+                    { text: "$n = 20$", isCorrect: false },
+                    { text: "$n = 22$", isCorrect: false }
+                ],
+                explanation: "$a = -4$, $b = 1 - (-4) = 5$, $U_n = 96$. Masukkan ke rumus $U_n = a + (n-1)b \\implies 96 = -4 + (n-1)5 \\implies 100 = (n-1)5 \\implies n-1 = 20 \\implies n = 21$. Kunci Jawaban: **A**."
+            },
+            {
+                id: 4,
+                type: "Geometri",
+                question: "Banyaknya suku ($n$) pada barisan geometri $3, 6, 12, 24, \\dots, 384$ adalah...",
+                options: [
+                    { text: "$n = 6$", isCorrect: false },
+                    { text: "$n = 7$", isCorrect: false },
+                    { text: "$n = 8$", isCorrect: true },
+                    { text: "$n = 9$", isCorrect: false }
+                ],
+                explanation: "$a = 3$, $r = 2$, $U_n = 384$. Masukkan ke $U_n = a \\cdot r^{n-1} \\implies 384 = 3 \\cdot 2^{n-1} \\implies 2^{n-1} = 128 = 2^7 \\implies n-1 = 7 \\implies n = 8$. Kunci Jawaban: **C**."
+            },
+            {
+                id: 5,
+                type: "Aritmetika",
+                question: "Di sebuah gudang, tumpukan batu bata paling atas berisi 10 buah, baris kedua 14 buah, baris ketiga 18 buah, dan seterusnya bertambah secara konstan. Berapakah jumlah batu bata pada baris ke-15 ($U_{15}$)?",
+                options: [
+                    { text: "62 buah", isCorrect: false },
+                    { text: "70 buah", isCorrect: false },
+                    { text: "58 buah", isCorrect: false },
+                    { text: "66 buah", isCorrect: true }
+                ],
+                explanation: "$a = 10$, $b = 4$. Suku ke-15 ($U_{15}$) = $a + 14b = 10 + 14(4) = 10 + 56 = 66$ buah. Kunci Jawaban: **D**."
+            },
+            {
+                id: 6,
+                type: "Geometri",
+                question: "Sebuah mesin pabrik dibeli seharga Rp100.000.000,00. Setiap tahun nilainya mengalami depresiasi dan menjadi $\\frac{4}{5}$ dari nilai tahun sebelumnya. Nilai mesin tersebut pada akhir tahun ke-4 adalah...",
+                options: [
+                    { text: "Rp40.960.000,00", isCorrect: true },
+                    { text: "Rp51.200.000,00", isCorrect: false },
+                    { text: "Rp32.768.000,00", isCorrect: false },
+                    { text: "Rp64.000.000,00", isCorrect: false }
+                ],
+                explanation: "Harga awal $a = 100.000.000$, $r = \\frac{4}{5} = 0,8$. Nilai akhir tahun ke-4 merupakan suku ke-5 ($U_5$): $U_5 = a \\cdot r^4 = 100.000.000 \\cdot (0,8)^4 = 100.000.000 \\cdot 0,4096 = \\text{Rp}40.960.000,00$. Kunci Jawaban: **A**."
+            },
+            {
+                id: 7,
+                type: "Aritmetika",
+                question: "Diketahui barisan aritmetika $100, 93, 86, 79, \\dots$. Suku bernilai negatif yang pertama kali muncul pada barisan ini adalah suku ke...",
+                options: [
+                    { text: "Suku ke-14", isCorrect: false },
+                    { text: "Suku ke-15", isCorrect: false },
+                    { text: "Suku ke-16", isCorrect: true },
+                    { text: "Suku ke-17", isCorrect: false }
+                ],
+                explanation: "$a = 100$, $b = -7$. Syarat $U_n < 0 \\implies 100 + (n-1)(-7) < 0 \\implies 100 - 7n + 7 < 0 \\implies 107 < 7n \\implies n > 15,28$. Maka nilai $n$ bulat terkecil adalah $16$. ($U_{16} = 100 + 15(-7) = -5$). Kunci Jawaban: **C**."
+            },
+            {
+                id: 8,
+                type: "Geometri",
+                question: "Diketahui barisan geometri $128, 64, 32, 16, \\dots$. Nilai dari suku ke-9 ($U_9$) adalah...",
+                options: [
+                    { text: "$2$", isCorrect: false },
+                    { text: "$\\frac{1}{2}$", isCorrect: true },
+                    { text: "$1$", isCorrect: false },
+                    { text: "$\\frac{1}{4}$", isCorrect: false }
+                ],
+                explanation: "$a = 128 = 2^7$, $r = \\frac{1}{2} = 2^{-1}$. $U_9 = a \\cdot r^8 = 2^7 \\cdot (2^{-1})^8 = 2^7 \\cdot 2^{-8} = 2^{-1} = \\frac{1}{2}$. Kunci Jawaban: **B**."
+            },
+            {
+                id: 9,
+                type: "Aritmetika",
+                question: "Suku ke-2 suatu barisan aritmetika adalah $25$ ($U_2 = 25$) dan suku ke-6 adalah $9$ ($U_6 = 9$). Nilai suku ke-10 ($U_{10}$) adalah...",
+                options: [
+                    { text: "$-5$", isCorrect: false },
+                    { text: "$-9$", isCorrect: false },
+                    { text: "$-3$", isCorrect: false },
+                    { text: "$-7$", isCorrect: true }
+                ],
+                explanation: "Cari beda: $b = \\frac{U_6 - U_2}{6 - 2} = \\frac{9 - 25}{4} = \\frac{-16}{4} = -4$. Cari $U_{10}$: $U_{10} = U_6 + 4b = 9 + 4(-4) = 9 - 16 = -7$. Kunci Jawaban: **D**."
+            },
+            {
+                id: 10,
+                type: "Geometri",
+                question: "Suatu jenis virus membelah diri menjadi 3 setiap 30 menit. Jika mula-mula terdapat 10 virus, berapa jumlah virus setelah 2,5 jam?",
+                options: [
+                    { text: "2.430 virus", isCorrect: true },
+                    { text: "810 virus", isCorrect: false },
+                    { text: "7.290 virus", isCorrect: false },
+                    { text: "1.620 virus", isCorrect: false }
+                ],
+                explanation: "Durasi 2,5 jam = 150 menit. Banyak periode pembelahan = $150 / 30 = 5$ kali. Maka kita mencari suku ke-6 ($U_6$): $a = 10, r = 3$. $U_6 = 10 \\cdot 3^5 = 10 \\cdot 243 = 2.430$ virus. Kunci Jawaban: **A**."
+            },
+            {
+                id: 11,
+                type: "Aritmetika",
+                question: "Diketahui tiga bilangan $(k - 1), (2k + 1), (4k - 1)$ membentuk barisan aritmetika. Nilai $k$ yang memenuhi adalah...",
+                options: [
+                    { text: "$k = 2$", isCorrect: false },
+                    { text: "$k = 4$", isCorrect: true },
+                    { text: "$k = 3$", isCorrect: false },
+                    { text: "$k = 5$", isCorrect: false }
+                ],
+                explanation: "Sifat barisan aritmetika: $2 U_2 = U_1 + U_3 \\implies 2(2k+1) = (k-1) + (4k-1) \\implies 4k + 2 = 5k - 2 \\implies 5k - 4k = 2 + 2 \\implies k = 4$. Kunci Jawaban: **B**."
+            },
+            {
+                id: 12,
+                type: "Geometri",
+                question: "Tiga bilangan $(x - 1), x, (x + 3)$ membentuk barisan geometri. Nilai $x$ yang memenuhi adalah...",
+                options: [
+                    { text: "$x = 3$", isCorrect: false },
+                    { text: "$x = 2$", isCorrect: false },
+                    { text: "$x = \\frac{3}{2}$", isCorrect: true },
+                    { text: "$x = \\frac{2}{3}$", isCorrect: false }
+                ],
+                explanation: "Sifat barisan geometri: $U_2^2 = U_1 \\cdot U_3 \\implies x^2 = (x - 1)(x + 3) \\implies x^2 = x^2 + 2x - 3 \\implies 2x = 3 \\implies x = \\frac{3}{2}$. Kunci Jawaban: **C**."
+            },
+            {
+                id: 13,
+                type: "Aritmetika",
+                question: "Seorang karyawan menerima gaji pertama sebesar Rp3.000.000,00 per bulan. Setiap tahun gajinya mengalami kenaikan tetap sebesar Rp250.000,00 per bulan. Berapakah gaji bulanan karyawan tersebut pada tahun ke-7?",
+                options: [
+                    { text: "Rp4.250.000,00", isCorrect: false },
+                    { text: "Rp4.750.000,00", isCorrect: false },
+                    { text: "Rp5.000.000,00", isCorrect: false },
+                    { text: "Rp4.500.000,00", isCorrect: true }
+                ],
+                explanation: "$a = 3.000.000$, $b = 250.000$, $n = 7$. $U_7 = a + 6b = 3.000.000 + 6(250.000) = 3.000.000 + 1.500.000 = \\text{Rp}4.500.000,00$. Kunci Jawaban: **D**."
+            },
+            {
+                id: 14,
+                type: "Geometri",
+                question: "Diketahui barisan geometri dengan suku ke-2 $U_2 = -6$ dan suku ke-5 $U_5 = 48$. Nilai rasio ($r$) barisan tersebut adalah...",
+                options: [
+                    { text: "$r = -2$", isCorrect: true },
+                    { text: "$r = 2$", isCorrect: false },
+                    { text: "$r = -4$", isCorrect: false },
+                    { text: "$r = 4$", isCorrect: false }
+                ],
+                explanation: "Rasio: $\\frac{U_5}{U_2} = r^3 \\implies \\frac{48}{-6} = r^3 \\implies r^3 = -8 \\implies r = -2$. Kunci Jawaban: **A**."
+            },
+            {
+                id: 15,
+                type: "Aritmetika",
+                question: "Pada suatu barisan aritmetika, diketahui $U_{12} = 53$ dan $U_7 = 33$. Suku ke-20 ($U_{20}$) barisan tersebut adalah...",
+                options: [
+                    { text: "80", isCorrect: false },
+                    { text: "85", isCorrect: true },
+                    { text: "81", isCorrect: false },
+                    { text: "89", isCorrect: false }
+                ],
+                explanation: "$b = \\frac{U_{12} - U_7}{12 - 7} = \\frac{53 - 33}{5} = \\frac{20}{5} = 4$. Maka $U_{20} = U_{12} + 8b = 53 + 8(4) = 53 + 32 = 85$. Kunci Jawaban: **B**."
+            },
+            {
+                id: 16,
+                type: "Geometri",
+                question: "Sebuah bola dijatuhkan dari ketinggian 8 meter. Setiap kali memantul, bola mencapai ketinggian $\\frac{3}{4}$ dari tinggi sebelumnya. Tinggi pantulan bola pada pantulan ke-3 adalah...",
+                options: [
+                    { text: "$\\frac{27}{4}\\text{ m}$", isCorrect: false },
+                    { text: "$\\frac{9}{2}\\text{ m}$", isCorrect: false },
+                    { text: "$\\frac{27}{8}\\text{ m}$", isCorrect: true },
+                    { text: "$4\\text{ m}$", isCorrect: false }
+                ],
+                explanation: "Pantulan 1 ($U_1$) = $8 \\times \\frac{3}{4} = 6$ m. Pantulan 2 ($U_2$) = $6 \\times \\frac{3}{4} = 4,5$ m. Pantulan 3 ($U_3$) = $4,5 \\times \\frac{3}{4} = \\frac{27}{8}$ m (atau $3,375$ m). Kunci Jawaban: **C**."
+            },
+            {
+                id: 17,
+                type: "Aritmetika",
+                question: "Suatu barisan aritmetika memiliki suku pertama $a = \\log 2$ dan beda $b = \\log 2$. Nilai suku ke-5 ($U_5$) dapat disederhanakan menjadi...",
+                options: [
+                    { text: "$\\log 10$", isCorrect: false },
+                    { text: "$\\log 64$", isCorrect: false },
+                    { text: "$5 \\log 10$", isCorrect: false },
+                    { text: "$\\log 32$", isCorrect: true }
+                ],
+                explanation: "$U_5 = a + 4b = \\log 2 + 4 \\log 2 = 5 \\log 2 = \\log (2^5) = \\log 32$. Kunci Jawaban: **D**."
+            },
+            {
+                id: 18,
+                type: "Geometri",
+                question: "Diketahui barisan geometri $2, 6, 18, \\dots$. Jika suku ke-$n$ bernilai $1.458$, maka nilai $n$ adalah...",
+                options: [
+                    { text: "$n = 7$", isCorrect: true },
+                    { text: "$n = 6$", isCorrect: false },
+                    { text: "$n = 8$", isCorrect: false },
+                    { text: "$n = 9$", isCorrect: false }
+                ],
+                explanation: "$a = 2$, $r = 3$. $U_n = a \\cdot r^{n-1} \\implies 1458 = 2 \\cdot 3^{n-1} \\implies 3^{n-1} = 729 = 3^6 \\implies n-1 = 6 \\implies n = 7$. Kunci Jawaban: **A**."
+            },
+            {
+                id: 19,
+                type: "Aritmetika",
+                question: "Diketahui barisan aritmetika $\\frac{1}{2}, 1, \\frac{3}{2}, 2, \\dots$. Nilai dari suku ke-25 ($U_{25}$) barisan ini adalah...",
+                options: [
+                    { text: "$12$", isCorrect: false },
+                    { text: "$13$", isCorrect: false },
+                    { text: "$12,5$", isCorrect: true },
+                    { text: "$11,5$", isCorrect: false }
+                ],
+                explanation: "$a = \\frac{1}{2}$, $b = \\frac{1}{2}$. $U_{25} = a + 24b = \\frac{1}{2} + 24\\left(\\frac{1}{2}\\right) = 0,5 + 12 = 12,5$. Kunci Jawaban: **C**."
+            },
+            {
+                id: 20,
+                type: "Geometri",
+                question: "Sebuah kultur bakteri membelah menjadi 2 setiap 20 menit. Jika pada pukul 08.00 terdapat 25 bakteri, pada pukul berapa jumlah bakteri menjadi 800?",
+                options: [
+                    { text: "Pukul 09.20", isCorrect: false },
+                    { text: "Pukul 09.40", isCorrect: true },
+                    { text: "Pukul 09.30", isCorrect: false },
+                    { text: "Pukul 10.00", isCorrect: false }
+                ],
+                explanation: "$a = 25$, $r = 2$. $U_n = 25 \\cdot 2^{n-1} = 800 \\implies 2^{n-1} = 32 = 2^5 \\implies n-1 = 5$ kali pembelahan. Durasi = $5 \\times 20\\text{ menit} = 100\\text{ menit} = 1\\text{ jam } 40\\text{ menit}$. Pukul 08.00 + 1 jam 40 menit = Pukul 09.40. Kunci Jawaban: **B**."
+            }
+        ];
+
+        // Safe LocalStorage Retrieval
+        let userAnswers = {};
+        try {
+            const saved = localStorage.getItem('math_quiz_answers_v2');
+            if (saved) {
+                userAnswers = JSON.parse(saved);
+            }
+        } catch (e) {
+            userAnswers = {};
+        }
+
+        // Safe KaTeX Helper
+        function triggerMathRender(targetElem = document.body) {
+            try {
+                if (window.renderMathInElement) {
+                    renderMathInElement(targetElem, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '$', right: '$', display: false},
+                            {left: '\\(', right: '\\)', display: false},
+                            {left: '\\[', right: '\\]', display: true}
+                        ],
+                        ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+                        throwOnError: false
+                    });
+                }
+            } catch (err) {
+                console.warn("KaTeX render notice:", err);
+            }
+        }
+
+        // Safe Icon Helper
+        function renderIcons() {
+            try {
+                if (window.lucide && typeof lucide.createIcons === 'function') {
+                    lucide.createIcons();
+                }
+            } catch (err) {
+                console.warn("Lucide render notice:", err);
+            }
+        }
+
+        // Save State
+        function saveState() {
+            try {
+                localStorage.setItem('math_quiz_answers_v2', JSON.stringify(userAnswers));
+            } catch (e) {}
+        }
+
+        // Modal Control Functions
+        window.openResetModal = function() {
+            document.getElementById('reset-modal').classList.remove('hidden');
+        };
+
+        window.closeResetModal = function() {
+            document.getElementById('reset-modal').classList.add('hidden');
+        };
+
+        window.executeReset = function() {
+            try {
+                localStorage.removeItem('math_quiz_answers_v2');
+            } catch (e) {}
+            userAnswers = {};
+            closeResetModal();
+            renderQuiz();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        // Select Option Handler - Instant Feedback
+        window.selectOption = function(qIdx, optIdx) {
+            if (userAnswers[qIdx] !== undefined) return; // Prevent changing after selected
+            
+            userAnswers[qIdx] = optIdx;
+            saveState();
+
+            // Re-render single question card
+            renderQuestionCard(qIdx);
+            updateProgress();
+        };
+
+        // Update Nav & Score Progress
+        function updateProgress() {
+            const answeredCount = Object.keys(userAnswers).length;
+            const progressPercent = (answeredCount / quizData.length) * 100;
+            
+            document.getElementById('progress-text').innerText = `${answeredCount} / ${quizData.length}`;
+            document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+
+            let correctCount = 0;
+
+            quizData.forEach((q, idx) => {
+                const navBtn = document.getElementById(`nav-btn-${idx}`);
+                const userOptIndex = userAnswers[idx];
+
+                if (userOptIndex !== undefined) {
+                    const isCorrect = q.options[userOptIndex] && q.options[userOptIndex].isCorrect;
+                    if (isCorrect) correctCount++;
+
+                    if (navBtn) {
+                        navBtn.className = isCorrect 
+                            ? "h-8 w-full text-xs font-bold rounded-lg bg-emerald-600 text-white flex items-center justify-center transition shadow-sm"
+                            : "h-8 w-full text-xs font-bold rounded-lg bg-rose-600 text-white flex items-center justify-center transition shadow-sm";
+                    }
+                } else if (navBtn) {
+                    navBtn.className = "h-8 w-full text-xs font-bold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center transition";
+                }
+            });
+
+            // Dynamic Score Calculation
+            const scoreValue = Math.round((correctCount / quizData.length) * 100);
+            const scoreElem = document.getElementById('score-text');
+            scoreElem.innerText = `${scoreValue} / 100`;
+            scoreElem.className = answeredCount > 0 ? "text-lg font-extrabold text-indigo-600" : "text-lg font-extrabold text-slate-400";
+        }
+
+        // Render Single Question Card
+        function renderQuestionCard(qIdx) {
+            const card = document.getElementById(`q-card-${qIdx}`);
+            if (!card) return;
+
+            const q = quizData[qIdx];
+            const userOpt = userAnswers[qIdx];
+            const isAnswered = userOpt !== undefined;
+
+            const isArith = q.type === "Aritmetika";
+            const badgeColor = isArith ? "bg-indigo-100 text-indigo-700" : "bg-amber-100 text-amber-700";
+
+            let optionsHTML = '';
+            const labels = ['A', 'B', 'C', 'D'];
+
+            q.options.forEach((opt, optIdx) => {
+                const isSelected = isAnswered && userOpt === optIdx;
+                let btnClass = "";
+                let badgeClass = "";
+                let statusTag = '';
+
+                if (isAnswered) {
+                    if (opt.isCorrect) {
+                        btnClass = "p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-950 font-semibold text-left text-xs sm:text-sm flex items-center justify-between gap-3 transition shadow-sm cursor-default";
+                        badgeClass = "bg-emerald-600 text-white";
+                        statusTag = `<span class="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md flex items-center gap-1 shrink-0"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Jawaban Benar</span>`;
+                    } else if (isSelected && !opt.isCorrect) {
+                        btnClass = "p-3.5 rounded-xl border-2 border-rose-500 bg-rose-50 text-rose-950 font-semibold text-left text-xs sm:text-sm flex items-center justify-between gap-3 transition shadow-sm cursor-default";
+                        badgeClass = "bg-rose-600 text-white";
+                        statusTag = `<span class="text-[11px] font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded-md flex items-center gap-1 shrink-0"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i> Jawaban Anda (Salah)</span>`;
+                    } else {
+                        btnClass = "p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-400 text-left text-xs sm:text-sm flex items-center justify-between gap-3 transition opacity-50 cursor-default";
+                        badgeClass = "bg-slate-200 text-slate-500";
+                    }
+                } else {
+                    btnClass = "p-3.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-left text-xs sm:text-sm flex items-center justify-between gap-3 transition hover:border-indigo-300";
+                    badgeClass = "bg-slate-100 border border-slate-200 text-slate-700";
+                }
+
+                optionsHTML += `
+                    <button onclick="selectOption(${qIdx}, ${optIdx})" ${isAnswered ? 'disabled' : ''} class="${btnClass}">
+                        <div class="flex items-center gap-3">
+                            <span class="w-6 h-6 rounded-lg ${badgeClass} flex items-center justify-center font-bold text-xs shrink-0">${labels[optIdx]}</span>
+                            <span>${opt.text}</span>
+                        </div>
+                        ${statusTag}
+                    </button>
+                `;
+            });
+
+            let explanationHTML = '';
+            if (isAnswered) {
+                explanationHTML = `
+                    <div class="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5 text-xs sm:text-sm text-slate-700 fade-in">
+                        <p class="font-bold text-slate-900 flex items-center gap-1.5">
+                            <i data-lucide="book-open-check" class="w-4 h-4 text-indigo-600"></i> Pembahasan Soal:
+                        </p>
+                        <p class="pt-1 leading-relaxed">${q.explanation}</p>
+                    </div>
+                `;
+            }
+
+            let statusBadge = '';
+            if (isAnswered) {
+                const isCorrect = q.options[userOpt] && q.options[userOpt].isCorrect;
+                statusBadge = isCorrect 
+                    ? '<span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5"></i> Benar</span>' 
+                    : '<span class="text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 flex items-center gap-1"><i data-lucide="x" class="w-3.5 h-3.5"></i> Salah</span>';
+            }
+
+            card.innerHTML = `
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="font-extrabold text-slate-900 text-sm">Soal ${qIdx + 1}</span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md ${badgeColor}">${q.type}</span>
+                    </div>
+                    ${statusBadge}
+                </div>
+                <p class="text-sm font-medium text-slate-800 leading-relaxed pt-1">${q.question}</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                    ${optionsHTML}
+                </div>
+                ${explanationHTML}
+            `;
+
+            renderIcons();
+            triggerMathRender(card);
+        }
+
+        // Render Entire Quiz
+        function renderQuiz() {
+            const container = document.getElementById('questions-container');
+            const navGrid = document.getElementById('nav-grid');
+            
+            if (!container || !navGrid) return;
+
+            container.innerHTML = '';
+            navGrid.innerHTML = '';
+
+            quizData.forEach((q, qIdx) => {
+                // Nav Grid Button
+                const navBtn = document.createElement('button');
+                navBtn.id = `nav-btn-${qIdx}`;
+                navBtn.innerText = qIdx + 1;
+                navBtn.onclick = () => {
+                    const cardElem = document.getElementById(`q-card-${qIdx}`);
+                    if (cardElem) cardElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                };
+                navGrid.appendChild(navBtn);
+
+                // Card Wrapper
+                const card = document.createElement('div');
+                card.id = `q-card-${qIdx}`;
+                card.className = "bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-4";
+                container.appendChild(card);
+
+                renderQuestionCard(qIdx);
+            });
+
+            updateProgress();
+            renderIcons();
+            triggerMathRender(container);
+        }
+
+        // Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            renderQuiz();
+        });
+
+        // Backup renderer when scripts load completely
+        window.onload = function() {
+            renderIcons();
+            triggerMathRender();
+        };
+    </script>
+</body>
+</html>
