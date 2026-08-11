@@ -1,6 +1,159 @@
-<!-- ... existing code ... -->
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Interaktif Barisan & Geometri</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        // 20 Questions Data Array (Acak & Terdistribusi Seimbang: 5 A, 5 B, 5 C, 5 D)
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- KaTeX CDN for mathematical formulas -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="triggerMathRender()"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-indigo-600 text-white rounded-xl shadow-md">
+                        <i data-lucide="brain-circuit" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg leading-tight text-slate-900">EduMath Quiz Master</h1>
+                        <p class="text-xs text-slate-500">20 Soal Barisan Aritmetika & Geometri</p>
+                    </div>
+                </div>
+
+                <!-- Reset Button -->
+                <div class="flex items-center gap-2 sm:gap-4">
+                    <button onclick="openResetModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-rose-200 text-rose-600 hover:bg-rose-50 font-semibold text-xs transition">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset Kuis
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- Top Overview & Progress Card -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Kuis Interaktif Instan</span>
+                    <h2 class="text-2xl font-bold text-slate-900 mt-0.5">Uji Barisan Aritmetika & Geometri</h2>
+                    <p class="text-xs text-slate-500 mt-1">Pilihlah jawaban untuk langsung melihat status kebenaran dan pembahasannya.</p>
+                </div>
+
+                <div class="flex items-center gap-4 bg-slate-50 p-3 rounded-xl border border-slate-200 shrink-0">
+                    <div class="text-center px-2">
+                        <span class="text-[10px] text-slate-400 font-semibold uppercase block">Progres Dijawab</span>
+                        <span id="progress-text" class="text-lg font-extrabold text-indigo-600">0 / 20</span>
+                    </div>
+                    <div class="h-8 w-px bg-slate-200"></div>
+                    <div class="text-center px-2">
+                        <span class="text-[10px] text-slate-400 font-semibold uppercase block">Skor Saat Ini</span>
+                        <span id="score-text" class="text-lg font-extrabold text-slate-400">0 / 100</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                <div id="progress-bar" class="bg-indigo-600 h-full transition-all duration-300 w-0"></div>
+            </div>
+
+            <!-- Question Navigation Grid -->
+            <div>
+                <span class="text-xs font-bold text-slate-500 mb-2 block">Navigasi Soal (1 - 20):</span>
+                <div id="nav-grid" class="grid grid-cols-5 sm:grid-cols-10 md:grid-cols-20 gap-1.5">
+                    <!-- Nav buttons dynamic rendering -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Questions Section -->
+        <div id="questions-container" class="space-y-6">
+            <!-- Questions rendered via JS -->
+        </div>
+
+    </main>
+
+    <!-- Custom Reset Confirmation Modal -->
+    <div id="reset-modal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-slate-100 space-y-4 fade-in">
+            <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
+                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+            </div>
+            <div class="text-center">
+                <h3 class="text-lg font-bold text-slate-900">Reset Seluruh Kuis?</h3>
+                <p class="text-xs text-slate-500 mt-1">Semua jawaban dan skor yang tersimpan akan dihapus dan kuis dimulai dari awal.</p>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button onclick="closeResetModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">Batal</button>
+                <button onclick="executeReset()" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md transition">Ya, Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-6">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+            <p>© 2026 EduMath Interactive • Evaluasi Mandiri Barisan Aritmetika & Geometri</p>
+        </div>
+    </footer>
+
+    <script>
+        // 20 Questions Data Array (Balanced random keys: 5 A, 5 B, 5 C, 5 D)
         const quizData = [
             {
                 id: 1,
@@ -244,6 +397,255 @@
             }
         ];
 
-        // LocalStorage State
-        let userAnswers = JSON.parse(localStorage.getItem('math_quiz_answers') || '{}');
-<!-- ... existing code ... -->
+        // Safe LocalStorage Retrieval
+        let userAnswers = {};
+        try {
+            const saved = localStorage.getItem('math_quiz_answers_v2');
+            if (saved) {
+                userAnswers = JSON.parse(saved);
+            }
+        } catch (e) {
+            userAnswers = {};
+        }
+
+        // Safe KaTeX Helper
+        function triggerMathRender(targetElem = document.body) {
+            try {
+                if (window.renderMathInElement) {
+                    renderMathInElement(targetElem, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '$', right: '$', display: false},
+                            {left: '\\(', right: '\\)', display: false},
+                            {left: '\\[', right: '\\]', display: true}
+                        ],
+                        ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+                        throwOnError: false
+                    });
+                }
+            } catch (err) {
+                console.warn("KaTeX render notice:", err);
+            }
+        }
+
+        // Safe Icon Helper
+        function renderIcons() {
+            try {
+                if (window.lucide && typeof lucide.createIcons === 'function') {
+                    lucide.createIcons();
+                }
+            } catch (err) {
+                console.warn("Lucide render notice:", err);
+            }
+        }
+
+        // Save State
+        function saveState() {
+            try {
+                localStorage.setItem('math_quiz_answers_v2', JSON.stringify(userAnswers));
+            } catch (e) {}
+        }
+
+        // Modal Control Functions
+        window.openResetModal = function() {
+            document.getElementById('reset-modal').classList.remove('hidden');
+        };
+
+        window.closeResetModal = function() {
+            document.getElementById('reset-modal').classList.add('hidden');
+        };
+
+        window.executeReset = function() {
+            try {
+                localStorage.removeItem('math_quiz_answers_v2');
+            } catch (e) {}
+            userAnswers = {};
+            closeResetModal();
+            renderQuiz();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        // Select Option Handler - Instant Feedback
+        window.selectOption = function(qIdx, optIdx) {
+            if (userAnswers[qIdx] !== undefined) return; // Prevent changing after selected
+            
+            userAnswers[qIdx] = optIdx;
+            saveState();
+
+            // Re-render single question card
+            renderQuestionCard(qIdx);
+            updateProgress();
+        };
+
+        // Update Nav & Score Progress
+        function updateProgress() {
+            const answeredCount = Object.keys(userAnswers).length;
+            const progressPercent = (answeredCount / quizData.length) * 100;
+            
+            document.getElementById('progress-text').innerText = `${answeredCount} / ${quizData.length}`;
+            document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+
+            let correctCount = 0;
+
+            quizData.forEach((q, idx) => {
+                const navBtn = document.getElementById(`nav-btn-${idx}`);
+                const userOptIndex = userAnswers[idx];
+
+                if (userOptIndex !== undefined) {
+                    const isCorrect = q.options[userOptIndex] && q.options[userOptIndex].isCorrect;
+                    if (isCorrect) correctCount++;
+
+                    if (navBtn) {
+                        navBtn.className = isCorrect 
+                            ? "h-8 w-full text-xs font-bold rounded-lg bg-emerald-600 text-white flex items-center justify-center transition shadow-sm"
+                            : "h-8 w-full text-xs font-bold rounded-lg bg-rose-600 text-white flex items-center justify-center transition shadow-sm";
+                    }
+                } else if (navBtn) {
+                    navBtn.className = "h-8 w-full text-xs font-bold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center transition";
+                }
+            });
+
+            // Dynamic Score Calculation
+            const scoreValue = Math.round((correctCount / quizData.length) * 100);
+            const scoreElem = document.getElementById('score-text');
+            scoreElem.innerText = `${scoreValue} / 100`;
+            scoreElem.className = answeredCount > 0 ? "text-lg font-extrabold text-indigo-600" : "text-lg font-extrabold text-slate-400";
+        }
+
+        // Render Single Question Card
+        function renderQuestionCard(qIdx) {
+            const card = document.getElementById(`q-card-${qIdx}`);
+            if (!card) return;
+
+            const q = quizData[qIdx];
+            const userOpt = userAnswers[qIdx];
+            const isAnswered = userOpt !== undefined;
+
+            const isArith = q.type === "Aritmetika";
+            const badgeColor = isArith ? "bg-indigo-100 text-indigo-700" : "bg-amber-100 text-amber-700";
+
+            let optionsHTML = '';
+            const labels = ['A', 'B', 'C', 'D'];
+
+            q.options.forEach((opt, optIdx) => {
+                const isSelected = isAnswered && userOpt === optIdx;
+                let btnClass = "";
+                let badgeClass = "";
+                let statusTag = '';
+
+                if (isAnswered) {
+                    if (opt.isCorrect) {
+                        btnClass = "p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-950 font-semibold text-left text-xs sm:text-sm flex items-center justify-between gap-3 transition shadow-sm cursor-default";
+                        badgeClass = "bg-emerald-600 text-white";
+                        statusTag = `<span class="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md flex items-center gap-1 shrink-0"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Jawaban Benar</span>`;
+                    } else if (isSelected && !opt.isCorrect) {
+                        btnClass = "p-3.5 rounded-xl border-2 border-rose-500 bg-rose-50 text-rose-950 font-semibold text-left text-xs sm:text-sm flex items-center justify-between gap-3 transition shadow-sm cursor-default";
+                        badgeClass = "bg-rose-600 text-white";
+                        statusTag = `<span class="text-[11px] font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded-md flex items-center gap-1 shrink-0"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i> Jawaban Anda (Salah)</span>`;
+                    } else {
+                        btnClass = "p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-400 text-left text-xs sm:text-sm flex items-center justify-between gap-3 transition opacity-50 cursor-default";
+                        badgeClass = "bg-slate-200 text-slate-500";
+                    }
+                } else {
+                    btnClass = "p-3.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-left text-xs sm:text-sm flex items-center justify-between gap-3 transition hover:border-indigo-300";
+                    badgeClass = "bg-slate-100 border border-slate-200 text-slate-700";
+                }
+
+                optionsHTML += `
+                    <button onclick="selectOption(${qIdx}, ${optIdx})" ${isAnswered ? 'disabled' : ''} class="${btnClass}">
+                        <div class="flex items-center gap-3">
+                            <span class="w-6 h-6 rounded-lg ${badgeClass} flex items-center justify-center font-bold text-xs shrink-0">${labels[optIdx]}</span>
+                            <span>${opt.text}</span>
+                        </div>
+                        ${statusTag}
+                    </button>
+                `;
+            });
+
+            let explanationHTML = '';
+            if (isAnswered) {
+                explanationHTML = `
+                    <div class="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5 text-xs sm:text-sm text-slate-700 fade-in">
+                        <p class="font-bold text-slate-900 flex items-center gap-1.5">
+                            <i data-lucide="book-open-check" class="w-4 h-4 text-indigo-600"></i> Pembahasan Soal:
+                        </p>
+                        <p class="pt-1 leading-relaxed">${q.explanation}</p>
+                    </div>
+                `;
+            }
+
+            let statusBadge = '';
+            if (isAnswered) {
+                const isCorrect = q.options[userOpt] && q.options[userOpt].isCorrect;
+                statusBadge = isCorrect 
+                    ? '<span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5"></i> Benar</span>' 
+                    : '<span class="text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 flex items-center gap-1"><i data-lucide="x" class="w-3.5 h-3.5"></i> Salah</span>';
+            }
+
+            card.innerHTML = `
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="font-extrabold text-slate-900 text-sm">Soal ${qIdx + 1}</span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md ${badgeColor}">${q.type}</span>
+                    </div>
+                    ${statusBadge}
+                </div>
+                <p class="text-sm font-medium text-slate-800 leading-relaxed pt-1">${q.question}</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                    ${optionsHTML}
+                </div>
+                ${explanationHTML}
+            `;
+
+            renderIcons();
+            triggerMathRender(card);
+        }
+
+        // Render Entire Quiz
+        function renderQuiz() {
+            const container = document.getElementById('questions-container');
+            const navGrid = document.getElementById('nav-grid');
+            
+            if (!container || !navGrid) return;
+
+            container.innerHTML = '';
+            navGrid.innerHTML = '';
+
+            quizData.forEach((q, qIdx) => {
+                // Nav Grid Button
+                const navBtn = document.createElement('button');
+                navBtn.id = `nav-btn-${qIdx}`;
+                navBtn.innerText = qIdx + 1;
+                navBtn.onclick = () => {
+                    const cardElem = document.getElementById(`q-card-${qIdx}`);
+                    if (cardElem) cardElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                };
+                navGrid.appendChild(navBtn);
+
+                // Card Wrapper
+                const card = document.createElement('div');
+                card.id = `q-card-${qIdx}`;
+                card.className = "bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-4";
+                container.appendChild(card);
+
+                renderQuestionCard(qIdx);
+            });
+
+            updateProgress();
+            renderIcons();
+            triggerMathRender(container);
+        }
+
+        // Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            renderQuiz();
+        });
+
+        // Backup renderer when scripts load completely
+        window.onload = function() {
+            renderIcons();
+            triggerMathRender();
+        };
+    </script>
+</body>
+</html>
